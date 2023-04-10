@@ -1,0 +1,3 @@
+(library
+ (name taype_driver)
+ (public_name taype-driver-lib))
