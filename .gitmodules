@@ -1,0 +1,9 @@
+[submodule "emp/ffi/emp-tool"]
+	path = emp/ffi/emp-tool
+	url = https://github.com/emp-toolkit/emp-tool.git
+[submodule "emp/ffi/emp-ot"]
+	path = emp/ffi/emp-ot
+	url = https://github.com/emp-toolkit/emp-ot.git
+[submodule "emp/ffi/emp-sh2pc"]
+	path = emp/ffi/emp-sh2pc
+	url = https://github.com/emp-toolkit/emp-sh2pc.git
