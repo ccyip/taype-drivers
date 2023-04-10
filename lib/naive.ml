@@ -44,6 +44,7 @@ module Make (OInt : OInt) : S = struct
     let obliv_array_new_for party n = OInt.make party 0 |> Array.make n
     let obliv_array_new n = OInt.make !this_party 0 |> Array.make n
     let obliv_int_s n = OInt.make !this_party n |> Array.make 1
+    let obliv_bool_s b = obliv_int_s (Bool.to_int b)
   end
 
   module Reveal = struct

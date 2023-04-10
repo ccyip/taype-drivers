@@ -118,6 +118,7 @@ module type S = sig
 
     val obliv_array_new : int -> t
     val obliv_int_s : int -> t
+    val obliv_bool_s : bool -> t
   end
 
   module Reveal : sig
