@@ -61,7 +61,7 @@ module type OInt = sig
 end
 
 module type S = sig
-  type t
+  type obliv_array
   (** Oblivious array *)
 
   val setup_driver : ?verbose:bool -> string -> int -> party -> unit
@@ -76,49 +76,49 @@ module type S = sig
   val report_stat : unit -> int
   (** See {!OInt.report_stat}. *)
 
-  val obliv_array_new : int -> t
+  val obliv_array_new : int -> obliv_array
   (** [obliv_array_new n] creates an oblivious array of length [n], filled with
       arbitrary values. *)
 
-  val obliv_array_concat : t -> t -> t
+  val obliv_array_concat : obliv_array -> obliv_array -> obliv_array
   (** Concatenate two oblivious arrays. *)
 
-  val obliv_array_slice : t -> int -> int -> t
+  val obliv_array_slice : obliv_array -> int -> int -> obliv_array
   (** [obliv_array_slice a n s] takes [s] elements from offset [n] of oblivious
       array [a]. *)
 
-  val obliv_array_mux : t -> t -> t -> t
+  val obliv_array_mux : obliv_array -> obliv_array -> obliv_array -> obliv_array
   (** [obliv_array_mux a0 a1 a2] is similar to the oblivious integer multiplexer
       {!OInt.mux}, but acts pairwise on the given arrays. The condition [a0]
       must be a singleton array of an oblivious boolean, and [a1] and [a2] must
       have the same size. *)
 
-  val obliv_int_s : int -> t
+  val obliv_int_s : int -> obliv_array
   (** Oblivious integer section *)
 
   (** Oblivious integer and boolean operations over oblivious arrays *)
 
-  val obliv_int_add : t -> t -> t
-  val obliv_int_sub : t -> t -> t
-  val obliv_int_mul : t -> t -> t
-  val obliv_int_div : t -> t -> t
-  val obliv_int_le : t -> t -> t
-  val obliv_int_eq : t -> t -> t
-  val obliv_bool_not : t -> t
-  val obliv_bool_and : t -> t -> t
-  val obliv_bool_or : t -> t -> t
+  val obliv_int_add : obliv_array -> obliv_array -> obliv_array
+  val obliv_int_sub : obliv_array -> obliv_array -> obliv_array
+  val obliv_int_mul : obliv_array -> obliv_array -> obliv_array
+  val obliv_int_div : obliv_array -> obliv_array -> obliv_array
+  val obliv_int_le : obliv_array -> obliv_array -> obliv_array
+  val obliv_int_eq : obliv_array -> obliv_array -> obliv_array
+  val obliv_bool_not : obliv_array -> obliv_array
+  val obliv_bool_and : obliv_array -> obliv_array -> obliv_array
+  val obliv_bool_or : obliv_array -> obliv_array -> obliv_array
 
   module Conceal : sig
     (** This module includes functions that are used in the conceal phase. *)
 
-    val obliv_array_new_for : party -> int -> t
+    val obliv_array_new_for : party -> int -> obliv_array
     (** [obliv_array_new_for party n] creates an oblivious array of length [n]
         for [party]. This function is used by the party without the private data
         to help the data-owner conceal their private data. *)
 
-    val obliv_array_new : int -> t
-    val obliv_int_s : int -> t
-    val obliv_bool_s : bool -> t
+    val obliv_array_new : int -> obliv_array
+    val obliv_int_s : int -> obliv_array
+    val obliv_bool_s : bool -> obliv_array
   end
 
   module Reveal : sig
@@ -126,10 +126,10 @@ module type S = sig
         careful, since misuse of the reveal functions can destroy the security
         guarantee. *)
 
-    val obliv_int_r : t -> int
+    val obliv_int_r : obliv_array -> int
     (** Oblivious integer retraction *)
 
-    val obliv_bool_r : t -> bool
+    val obliv_bool_r : obliv_array -> bool
     (** Oblivious boolean retraction *)
   end
 end

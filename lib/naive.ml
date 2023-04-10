@@ -1,7 +1,7 @@
 open Intf
 
 module Make (OInt : OInt) : S = struct
-  type t = OInt.t Array.t
+  type obliv_array = OInt.t Array.t
 
   let this_party = ref PublicP
 
