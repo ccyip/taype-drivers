@@ -3,8 +3,8 @@ open Intf
 module Make (OInt : OInt) : S = struct
   type t
 
-  let capability = OInt.capability
-  let setup_driver = OInt.setup_driver
+  let setup_driver ?(verbose=false) addr port party =
+    OInt.setup_driver verbose addr port party
   let finalize_driver = OInt.finalize_driver
   let collect_stat = OInt.collect_stat
   let report_stat = OInt.report_stat

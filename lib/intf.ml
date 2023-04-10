@@ -2,21 +2,13 @@ type party =
   | PublicP
   | PrivateP of int  (** A private party is indexed by a positive number. *)
 
-(** Capability of a driver *)
-type capability =
-  | Infinity  (** Support any arbitrary number of parties. *)
-  | NotMoreThan of int  (** Support a bounded number of parties. *)
-
 module type OInt = sig
   type t
   (** Oblivious integer, which also doubles as oblivious boolean *)
 
-  val capability : capability
-  (** Specify the capability of this driver. *)
-
-  val setup_driver : ?verbose:bool -> string -> int -> party -> unit
-  (** [setup_driver ~verbose addr port party] initializes the driver context
-      with IP address [addr] and [port], for [party]. *)
+  val setup_driver : bool -> string -> int -> party -> unit
+  (** [setup_driver verbose addr port party] initializes the driver context with
+      IP address [addr] and [port], for [party]. *)
 
   val finalize_driver : unit -> unit
   (** Clean up the driver context. Must call this function after finishing the
@@ -61,20 +53,17 @@ module type OInt = sig
 
   (** Oblivious boolean arithmetic *)
 
+  val band : t -> t -> t
+  val bor : t -> t -> t
   val bnot : t -> t
-  val band : t -> t
-  val bor : t -> t
 end
 
 module type S = sig
   type t
   (** Oblivious array *)
 
-  val capability : capability
-  (** See {!OInt.get_capability}. *)
-
   val setup_driver : ?verbose:bool -> string -> int -> party -> unit
-  (** See {!OInt.setup_driver}. *)
+  (** See {!OInt.setup_driver}. The value of [verbose] is [false] by default. *)
 
   val finalize_driver : unit -> unit
   (** See {!OInt.finalize_driver}. *)
