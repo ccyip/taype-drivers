@@ -2,6 +2,8 @@ type party =
   | PublicP
   | PrivateP of int  (** A private party is indexed by a positive number. *)
 
+exception Unknown_party
+
 module type OInt = sig
   type t
   (** Oblivious integer, which also doubles as oblivious boolean *)
