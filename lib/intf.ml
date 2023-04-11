@@ -65,16 +65,17 @@ module type S = sig
   (** Oblivious array *)
 
   val setup_driver : ?verbose:bool -> string -> int -> party -> unit
-  (** See {!OInt.setup_driver}. The value of [verbose] is [false] by default. *)
+  (** See {{!Taype_driver.OInt.setup_driver} [OInt.setup_driver]}. The value of
+      [verbose] is [false] by default. *)
 
   val finalize_driver : unit -> unit
-  (** See {!OInt.finalize_driver}. *)
+  (** See {{!Taype_driver.OInt.finalize_driver} [OInt.finalize_driver]}. *)
 
   val collect_stat : unit -> unit
-  (** See {!OInt.collect_stat}. *)
+  (** See {{!Taype_driver.OInt.collect_stat} [OInt.collect_stat]}. *)
 
   val report_stat : unit -> int
-  (** See {!OInt.report_stat}. *)
+  (** See {{!Taype_driver.OInt.report_stat} [OInt.report_stat]}. *)
 
   val obliv_array_length : obliv_array -> int
   (** [obliv_array_length a] returns the size of [a]. This function is mostly
@@ -94,9 +95,9 @@ module type S = sig
 
   val obliv_array_mux : obliv_array -> obliv_array -> obliv_array -> obliv_array
   (** [obliv_array_mux a0 a1 a2] is similar to the oblivious integer multiplexer
-      {!OInt.mux}, but acts pairwise on the given arrays. The condition [a0]
-      must be a singleton array of an oblivious boolean, and [a1] and [a2] must
-      have the same size. *)
+      {{!Taype_driver.OInt.mux} [OInt.mux]}, but acts pairwise on the given
+      arrays. The condition [a0] must be a singleton array of an oblivious
+      boolean, and [a1] and [a2] must have the same size. *)
 
   val obliv_int_s : int -> obliv_array
   (** Oblivious integer section *)
