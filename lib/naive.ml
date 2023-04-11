@@ -12,6 +12,7 @@ module Make (OInt : OInt) : S = struct
   let finalize_driver = OInt.finalize_driver
   let collect_stat = OInt.collect_stat
   let report_stat = OInt.report_stat
+  let obliv_array_length = Array.length
   let obliv_array_new n = OInt.make PublicP 0 |> Array.make n
   let obliv_array_concat = Array.append
   let obliv_array_slice = Array.sub

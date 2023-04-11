@@ -76,6 +76,11 @@ module type S = sig
   val report_stat : unit -> int
   (** See {!OInt.report_stat}. *)
 
+  val obliv_array_length : obliv_array -> int
+  (** [obliv_array_length a] returns the size of [a]. This function is mostly
+      used for debugging, since the OCaml programs generated from Taype do not
+      use this function. *)
+
   val obliv_array_new : int -> obliv_array
   (** [obliv_array_new n] creates an oblivious array of length [n], filled with
       arbitrary values. *)
