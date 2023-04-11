@@ -1,2 +1,2 @@
 open Intf
-module Make : OInt -> S
+module Make (_ : OInt) : S
