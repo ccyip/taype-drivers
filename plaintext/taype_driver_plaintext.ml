@@ -18,7 +18,9 @@ module OInt : OInt = struct
   let reveal_int n = n
   let reveal_bool n = to_bool n
 
-  let mux s m n = if to_bool s then m else n
+  let mux s m n =
+    count := !count + 1;
+    if to_bool s then m else n
 
   let add = ( + )
   let sub = ( - )
