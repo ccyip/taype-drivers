@@ -5,7 +5,7 @@ module Make (OInt : OInt) : S = struct
 
   let this_party = ref PublicP
 
-  let setup_driver ?(verbose=false) addr port party =
+  let setup_driver ?(verbose = false) addr port party =
     OInt.setup_driver verbose addr port party;
     this_party := party
 
@@ -13,7 +13,11 @@ module Make (OInt : OInt) : S = struct
   let collect_stat = OInt.collect_stat
   let report_stat = OInt.report_stat
   let obliv_array_length = Array.length
-  let obliv_array_new n = OInt.make PublicP 0 |> Array.make n
+
+  let obliv_array_new = function
+    | 0 -> [||]
+    | n -> OInt.make PublicP 0 |> Array.make n
+
   let obliv_array_concat = Array.append
   let obliv_array_slice = Array.sub
 
