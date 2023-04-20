@@ -17,7 +17,7 @@ module Make0 (OInt : OInt0) : S0 with type obliv_array = OInt.t Array.t = struct
     let b = a0.(0) in
     Array.map2 (OInt.mux b) a1 a2
 
-  let obliv_int_s n = OInt.make Party.Public n |> Array.make 1
+  let obliv_int_s n = OInt.make n Party.Public |> Array.make 1
 
   let obliv_binop op a1 a2 =
     assert (Array.length a1 = 1 && Array.length a2 = 1);
@@ -59,18 +59,18 @@ module Make (OInt : OInt) : S = struct
 
   module Conceal = struct
     let obliv_array_conceal a =
-      let f x = OInt.make !this_party x in
+      let f x = OInt.make x !this_party in
       Array.map f a
 
     let obliv_array_conceal_with s x = obliv_array_conceal (s x)
 
-    let obliv_array_new_for party n =
+    let obliv_array_new_for n party =
       Array.init n (fun _ -> OInt.arbitrary party)
 
     let obliv_int_s = obliv_array_conceal_with Plaintext.obliv_int_s
     let obliv_bool_s b = obliv_int_s (Bool.to_int b)
-    let obliv_int_s_for party = obliv_array_new_for party 1
-    let obliv_bool_s_for party = obliv_array_new_for party 1
+    let obliv_int_s_for party = obliv_array_new_for 1 party
+    let obliv_bool_s_for party = obliv_array_new_for 1 party
   end
 
   module Reveal = struct

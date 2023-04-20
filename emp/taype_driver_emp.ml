@@ -36,8 +36,8 @@ module OInt : OInt = struct
         check_party_idx p;
         p
 
-  let make p n = F.obliv_int_new n (int_of_party p) |> finalise
-  let arbitrary p = make p 0
+  let make n p = F.obliv_int_new n (int_of_party p) |> finalise
+  let arbitrary p = make 0 p
   let reveal_int = F.obliv_int_reveal
   let mux s m n = F.obliv_int_mux s m n |> finalise
   let add m n = F.obliv_int_add m n |> finalise

@@ -1,13 +1,14 @@
 type party = Party.t
 
 exception Unknown_party
+exception Unsupported
 
 module type OInt0 = sig
   type t
   (** Oblivious integer, which also doubles as oblivious boolean *)
 
-  val make : party -> int -> t
-  (** [make party n] creates an oblivious integer of value [n] for [party]. *)
+  val make : int -> party -> t
+  (** [make n party] creates an oblivious integer of value [n] for [party]. *)
 
   val arbitrary : party -> t
   (** [arbitrary party] creates an arbitrary integer for [party]. *)
@@ -138,8 +139,8 @@ module type S = sig
     (** [obliv_array_conceal_with s x] conceals the result of the section
         function [s] applied to public data [x]. *)
 
-    val obliv_array_new_for : party -> int -> obliv_array
-    (** [obliv_array_new_for party n] creates an oblivious array of length [n]
+    val obliv_array_new_for : int -> party -> obliv_array
+    (** [obliv_array_new_for n party] creates an oblivious array of length [n]
         for [party]. This function is used by the party without the private data
         to help the data-owner conceal their private data. *)
 

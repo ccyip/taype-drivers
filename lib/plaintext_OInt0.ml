@@ -2,7 +2,7 @@ type t = int
 
 let to_bool n = n <> 0
 let of_bool = Bool.to_int
-let make _ n = n
+let make n _ = n
 let arbitrary _ = 0
 let reveal_int n = n
 let mux s m n = if to_bool s then m else n
