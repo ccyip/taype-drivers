@@ -1,22 +1,13 @@
 open Intf
 
-module Make (OInt : OInt) : S = struct
+module Make0 (OInt : OInt0) : S0 with type obliv_array = OInt.t Array.t = struct
   type obliv_array = OInt.t Array.t
 
-  let this_party = ref PublicP
-
-  let setup_driver ?(verbose = false) addr port party =
-    OInt.setup_driver verbose addr port party;
-    this_party := party
-
-  let finalize_driver = OInt.finalize_driver
-  let collect_stat = OInt.collect_stat
-  let report_stat = OInt.report_stat
   let obliv_array_length = Array.length
 
   let obliv_array_new = function
     | 0 -> [||]
-    | n -> OInt.make PublicP 0 |> Array.make n
+    | n -> OInt.arbitrary PublicP |> Array.make n
 
   let obliv_array_concat = Array.append
   let obliv_array_slice = Array.sub
@@ -45,20 +36,48 @@ module Make (OInt : OInt) : S = struct
     assert (Array.length a = 1);
     OInt.bnot a.(0) |> Array.make 1
 
-  module Conceal = struct
-    let obliv_array_new_for party n = Array.init n (fun _ -> OInt.make party 0)
-    let obliv_array_new n = obliv_array_new_for !this_party n
-    let obliv_int_s n = OInt.make !this_party n |> Array.make 1
-    let obliv_bool_s b = obliv_int_s (Bool.to_int b)
-  end
-
   module Reveal = struct
     let obliv_int_r a =
       assert (Array.length a = 1);
       OInt.reveal_int a.(0)
+  end
+end
 
-    let obliv_bool_r a =
-      assert (Array.length a = 1);
-      OInt.reveal_bool a.(0)
+module Make (OInt : OInt) : S = struct
+  let this_party = ref PublicP
+
+  let setup_driver ?(verbose = false) addr port party =
+    OInt.setup_driver verbose addr port party;
+    this_party := party
+
+  let finalize_driver = OInt.finalize_driver
+  let collect_stat = OInt.collect_stat
+  let report_stat = OInt.report_stat
+
+  include Make0 (OInt)
+  module Plaintext = Make0 (Plaintext_OInt0)
+
+  module Conceal = struct
+    let obliv_array_conceal a =
+      let f x = OInt.make !this_party x in
+      Array.map f a
+
+    let obliv_array_conceal_with s x = obliv_array_conceal (s x)
+
+    let obliv_array_new_for party n =
+      Array.init n (fun _ -> OInt.arbitrary party)
+
+    let obliv_int_s = obliv_array_conceal_with Plaintext.obliv_int_s
+    let obliv_bool_s b = obliv_int_s (Bool.to_int b)
+  end
+
+  module Reveal = struct
+    let obliv_array_reveal a =
+      let f x = OInt.reveal_int x in
+      Array.map f a
+
+    let obliv_array_reveal_with r a = r (obliv_array_reveal a)
+    let obliv_int_r = Reveal.obliv_int_r
+    let obliv_bool_r a = obliv_int_r a <> 0
   end
 end

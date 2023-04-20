@@ -37,8 +37,8 @@ module OInt : OInt = struct
         p
 
   let make p n = F.obliv_int_new n (int_of_party p) |> finalise
+  let arbitrary p = make p 0
   let reveal_int = F.obliv_int_reveal
-  let reveal_bool = F.obliv_bool_reveal
   let mux s m n = F.obliv_int_mux s m n |> finalise
   let add m n = F.obliv_int_add m n |> finalise
   let sub m n = F.obliv_int_sub m n |> finalise

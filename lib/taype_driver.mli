@@ -2,6 +2,7 @@
     driver. *)
 
 include module type of Intf
+module Plaintext_OInt0 : OInt0
 
 (** Create a naive driver from an oblivious integer module. The return module is
     as naive as possible, so that it serves as a reference implementation. While
