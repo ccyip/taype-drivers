@@ -148,8 +148,14 @@ module type S = sig
     val obliv_int_s : int -> obliv_array
     (** Oblivious integer section *)
 
+    val obliv_int_s_for : party -> obliv_array
+    (** Help the private data-owner [party] do the integer section. *)
+
     val obliv_bool_s : bool -> obliv_array
     (** Oblivious boolean section *)
+
+    val obliv_bool_s_for : party -> obliv_array
+    (** Help the private data-owner [party] do the boolean section. *)
   end
 
   module Reveal : sig

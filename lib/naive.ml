@@ -69,6 +69,8 @@ module Make (OInt : OInt) : S = struct
 
     let obliv_int_s = obliv_array_conceal_with Plaintext.obliv_int_s
     let obliv_bool_s b = obliv_int_s (Bool.to_int b)
+    let obliv_int_s_for party = obliv_array_new_for party 1
+    let obliv_bool_s_for party = obliv_array_new_for party 1
   end
 
   module Reveal = struct
