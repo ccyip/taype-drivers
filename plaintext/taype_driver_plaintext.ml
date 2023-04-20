@@ -6,8 +6,8 @@ module OInt : OInt = struct
   let count : int ref = ref 0
 
   let setup_driver _ _ _ = function
-    | PublicP -> ()
-    | PrivateP _ -> raise Unknown_party
+    | Party.Public -> ()
+    | Party.Private _ -> raise Unknown_party
 
   let finalize_driver () = ()
   let collect_stat () = count := 0

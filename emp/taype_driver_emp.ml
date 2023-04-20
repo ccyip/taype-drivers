@@ -10,8 +10,8 @@ module OInt : OInt = struct
   let setup_driver verbose addr port party =
     let p =
       match party with
-      | PublicP -> raise Unknown_party
-      | PrivateP p ->
+      | Party.Public -> raise Unknown_party
+      | Party.Private p ->
           check_party_idx p;
           p
     in
@@ -31,8 +31,8 @@ module OInt : OInt = struct
     p
 
   let int_of_party = function
-    | PublicP -> 0
-    | PrivateP p ->
+    | Party.Public -> 0
+    | Party.Private p ->
         check_party_idx p;
         p
 

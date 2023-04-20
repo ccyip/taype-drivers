@@ -7,7 +7,7 @@ module Make0 (OInt : OInt0) : S0 with type obliv_array = OInt.t Array.t = struct
 
   let obliv_array_new = function
     | 0 -> [||]
-    | n -> OInt.arbitrary PublicP |> Array.make n
+    | n -> OInt.arbitrary Party.Public |> Array.make n
 
   let obliv_array_concat = Array.append
   let obliv_array_slice = Array.sub
@@ -17,7 +17,7 @@ module Make0 (OInt : OInt0) : S0 with type obliv_array = OInt.t Array.t = struct
     let b = a0.(0) in
     Array.map2 (OInt.mux b) a1 a2
 
-  let obliv_int_s n = OInt.make PublicP n |> Array.make 1
+  let obliv_int_s n = OInt.make Party.Public n |> Array.make 1
 
   let obliv_binop op a1 a2 =
     assert (Array.length a1 = 1 && Array.length a2 = 1);
@@ -44,7 +44,7 @@ module Make0 (OInt : OInt0) : S0 with type obliv_array = OInt.t Array.t = struct
 end
 
 module Make (OInt : OInt) : S = struct
-  let this_party = ref PublicP
+  let this_party = ref Party.Public
 
   let setup_driver ?(verbose = false) addr port party =
     OInt.setup_driver verbose addr port party;

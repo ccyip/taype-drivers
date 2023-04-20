@@ -1,6 +1,7 @@
 (** This module includes the infrastructure for creating and using a Taype
     driver. *)
 
+module Party = Party
 include module type of Intf
 module Plaintext_OInt0 : OInt0
 

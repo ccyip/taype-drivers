@@ -1,6 +1,4 @@
-type party =
-  | PublicP
-  | PrivateP of int  (** A private party is indexed by a positive number. *)
+type party = Party.t
 
 exception Unknown_party
 
