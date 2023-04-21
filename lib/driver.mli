@@ -1,2 +1,2 @@
 open Intf
-module Make (_ : OInt) : S
+module Make (OInt : OInt) : S with type obliv_int = OInt.t

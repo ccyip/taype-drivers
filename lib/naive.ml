@@ -1,6 +1,7 @@
 open Intf
 
-module Make0 (OInt : OInt0) : S0 with type obliv_array = OInt.t Array.t = struct
+module Make0 (OInt : OInt0) = struct
+  type obliv_int = OInt.t
   type obliv_array = OInt.t Array.t
 
   let obliv_array_length = Array.length
@@ -11,6 +12,7 @@ module Make0 (OInt : OInt0) : S0 with type obliv_array = OInt.t Array.t = struct
 
   let obliv_array_concat = Array.append
   let obliv_array_slice = Array.sub
+  let obliv_array_to_array a = a
 
   let obliv_array_mux a0 a1 a2 =
     assert (Array.length a0 = 1 && Array.length a1 = Array.length a2);
@@ -43,7 +45,7 @@ module Make0 (OInt : OInt0) : S0 with type obliv_array = OInt.t Array.t = struct
   end
 end
 
-module Make (OInt : OInt) : S = struct
+module Make (OInt : OInt) = struct
   let this_party = ref Party.Public
 
   let setup_driver ?(verbose = false) addr port party =

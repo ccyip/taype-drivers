@@ -63,6 +63,9 @@ module type OInt = sig
 end
 
 module type S0 = sig
+  type obliv_int
+  (** Oblivious integer *)
+
   type obliv_array
   (** Oblivious array *)
 
@@ -81,6 +84,8 @@ module type S0 = sig
   val obliv_array_slice : obliv_array -> int -> int -> obliv_array
   (** [obliv_array_slice a n s] takes [s] elements from offset [n] of oblivious
       array [a]. *)
+
+  val obliv_array_to_array : obliv_array -> obliv_int Array.t
 
   val obliv_array_mux : obliv_array -> obliv_array -> obliv_array -> obliv_array
   (** [obliv_array_mux a0 a1 a2] is similar to the oblivious integer multiplexer
