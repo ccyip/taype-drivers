@@ -1,3 +1,4 @@
 (library
  (name taype_driver)
- (public_name taype-driver-lib))
+ (public_name taype-driver-lib)
+ (libraries containers))

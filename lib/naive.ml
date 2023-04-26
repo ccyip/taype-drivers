@@ -1,4 +1,5 @@
 open Intf
+open Containers
 
 module Make0 (OInt : OInt0) = struct
   type obliv_int = OInt.t
@@ -82,6 +83,6 @@ module Make (OInt : OInt) = struct
 
     let obliv_array_reveal_with r a = r (obliv_array_reveal a)
     let obliv_int_r = Reveal.obliv_int_r
-    let obliv_bool_r a = obliv_int_r a <> 0
+    let obliv_bool_r a = Bool.of_int (obliv_int_r a)
   end
 end
