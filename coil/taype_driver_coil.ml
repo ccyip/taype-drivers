@@ -43,7 +43,7 @@ module OInt = struct
         in_c := 0;
         var_c := 0;
         ctx := []
-    | Party.Private 1 -> raise Unsupported
+    | Party.Trusted -> raise Unsupported
     | Party.Private _ -> raise Unknown_party
 
   let finalize_driver () = ()
@@ -56,7 +56,7 @@ module OInt = struct
 
   let arbitrary = function
     | Party.Public -> Enc 0 |> extend_ctx
-    | Party.Private 1 -> In (make_in ())
+    | Party.Trusted -> In (make_in ())
     | Party.Private _ -> raise Unsupported
 
   let reveal_int _ = raise Unsupported

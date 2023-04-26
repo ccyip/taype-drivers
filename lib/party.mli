@@ -3,6 +3,7 @@
 
 type t =
   | Public
+  | Trusted
   | Private of int  (** A private party is indexed by a positive number. *)
 
 val to_string : t -> string
