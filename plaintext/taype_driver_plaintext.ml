@@ -1,6 +1,6 @@
 open Taype_driver
 
-module OInt : OInt = struct
+module OInt = struct
   include Plaintext_OInt0
 
   let count : int ref = ref 0
@@ -18,4 +18,4 @@ module OInt : OInt = struct
     mux s m n
 end
 
-module Driver : S = Make (OInt)
+module Driver = Make (OInt)

@@ -1,7 +1,7 @@
 open Taype_driver
 module F = C.Functions
 
-module OInt : OInt = struct
+module OInt = struct
   type t = C.Types.t
 
   let stamp : float ref = ref 0.0
@@ -52,4 +52,4 @@ module OInt : OInt = struct
   let bnot m = F.obliv_bool_not m |> finalise
 end
 
-module Driver : S = Make (OInt)
+module Driver = Make (OInt)
