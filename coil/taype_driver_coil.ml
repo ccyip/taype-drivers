@@ -104,6 +104,6 @@ let sexp_of_coil : Driver.obliv_array -> Sexp.t =
   let output =
     Array.to_list (Driver.obliv_array_to_array a) |> sexp_of_vars |> Sexp.list
   in
-  Sexp.list [Sexp.atom "let"; Sexp.list ctx; output]
+  Sexp.list [ Sexp.atom "let"; Sexp.list ctx; output ]
 
 let print_coil a = Sexp.to_chan stdout (sexp_of_coil a)

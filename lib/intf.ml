@@ -225,6 +225,5 @@ module type OArray = functor (OInt : OInt0) -> sig
   (** See [obliv_array_to_array] in {{!Taype_driver.Maker} [Maker]}. *)
 
   val of_array : OInt.t array -> t
-  (** Convert an array of the underlying oblivious integers to oblivious
-      array. *)
+  (** Convert an array of the underlying oblivious integers to oblivious array. *)
 end

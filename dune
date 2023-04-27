@@ -1,3 +1,4 @@
 (env
  (release
-  (flags (:standard -noassert))))
+  (flags
+   (:standard -noassert))))
