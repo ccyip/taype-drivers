@@ -63,9 +63,6 @@ module type OInt = sig
 end
 
 module type S0 = sig
-  type obliv_int
-  (** Oblivious integer *)
-
   type obliv_array
   (** Oblivious array *)
 
@@ -84,8 +81,6 @@ module type S0 = sig
   val obliv_array_slice : obliv_array -> int -> int -> obliv_array
   (** [obliv_array_slice a n s] takes [s] elements from offset [n] of oblivious
       array [a]. *)
-
-  val obliv_array_to_array : obliv_array -> obliv_int Array.t
 
   val obliv_array_mux : obliv_array -> obliv_array -> obliv_array -> obliv_array
   (** [obliv_array_mux a0 a1 a2] is similar to the oblivious integer multiplexer
@@ -181,4 +176,55 @@ module type S = sig
     val obliv_bool_r : obliv_array -> bool
     (** Oblivious boolean retraction *)
   end
+end
+
+module type Maker = functor (OInt : OInt) -> sig
+  include S
+
+  val obliv_array_to_array : obliv_array -> OInt.t array
+  (** Convert the oblivious array to an [array] of its underlying oblivious
+      integers. This function should only be used within the driver for
+      accessing the result, and should not be exposed to the clients of the
+      driver. *)
+end
+
+module type OArray = functor (OInt : OInt0) -> sig
+  type t
+  (** Oblivious array. It is equivalent to [OInt.t array], but not necessarily
+      represented as such. *)
+
+  module Elem : OInt0
+  (** This oblivious integer module defines the element type of the oblivious
+      array, i.e. [t] is an array of [Elem.t]. Not to be confused with the
+      functor argument [OInt]: it is the underlying oblivious integer module
+      that is not necessarily the element (directly). *)
+
+  val arbitrary : int -> t
+  (** [arbitrary n] creates an oblivious array with arbitrary values of length
+      [n]. *)
+
+  val single : Elem.t -> t
+  (** Create a singleton oblivious array. *)
+
+  val hd : t -> Elem.t
+  (** Get the first element of the oblivious array. *)
+
+  val length : t -> int
+  (** See {{!Taype_driver.S.obliv_array_length} [S.obliv_array_length]}. *)
+
+  val concat : t -> t -> t
+  (** See {{!Taype_driver.S.obliv_array_concat} [S.obliv_array_concat]}. *)
+
+  val slice : t -> int -> int -> t
+  (** See {{!Taype_driver.S.obliv_array_slice} [S.obliv_array_slice]}. *)
+
+  val mux : t -> t -> t -> t
+  (** See {{!Taype_driver.S.obliv_array_mux} [S.obliv_array_mux]}. *)
+
+  val to_array : t -> OInt.t array
+  (** See [obliv_array_to_array] in {{!Taype_driver.Maker} [Maker]}. *)
+
+  val of_array : OInt.t array -> t
+  (** Convert an array of the underlying oblivious integers to oblivious
+      array. *)
 end
