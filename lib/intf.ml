@@ -206,8 +206,8 @@ module type OArray = functor (OInt : OInt0) -> sig
   val single : Elem.t -> t
   (** Create a singleton oblivious array. *)
 
-  val hd : t -> Elem.t
-  (** Get the first element of the oblivious array. *)
+  val get : t -> Elem.t
+  (** Get the element of a singleton oblivious array. *)
 
   val length : t -> int
   (** See {{!Taype_driver.S.obliv_array_length} [S.obliv_array_length]}. *)

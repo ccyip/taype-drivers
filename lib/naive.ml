@@ -10,7 +10,7 @@ module OArray (OInt : OInt0) = struct
     | n -> Elem.arbitrary Party.Public |> Array.make n
 
   let single x = [| x |]
-  let hd a = a.(0)
+  let get a = a.(0)
   let length = Array.length
   let concat = Array.append
   let slice = Array.sub

@@ -20,7 +20,7 @@ module Make0 (OArrayF : OArray) (OInt : OInt0) = struct
 
   let binop op a1 a2 =
     assert (OArray.length a1 = 1 && OArray.length a2 = 1);
-    op (OArray.hd a1) (OArray.hd a2) |> OArray.single
+    op (OArray.get a1) (OArray.get a2) |> OArray.single
 
   let obliv_int_add = binop Elem.add
   let obliv_int_sub = binop Elem.sub
@@ -33,12 +33,12 @@ module Make0 (OArrayF : OArray) (OInt : OInt0) = struct
 
   let obliv_bool_not a =
     assert (OArray.length a = 1);
-    Elem.bnot (OArray.hd a) |> OArray.single
+    Elem.bnot (OArray.get a) |> OArray.single
 
   module Reveal = struct
     let obliv_int_r a =
       assert (OArray.length a = 1);
-      Elem.reveal_int (OArray.hd a)
+      Elem.reveal_int (OArray.get a)
   end
 end
 
