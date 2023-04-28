@@ -6,6 +6,14 @@ module Smart_OInt (OInt : OInt0) = struct
 
   let obliv x = Obliv x
 
+  (* A sound but incomplete equality check. *)
+  let cheap_eq x y =
+    match (x, y) with
+    | Arb, Arb -> true
+    | Known m, Known n -> m = n
+    | Obliv m, Obliv n -> Equal.physical m n
+    | _, _ -> false
+
   let force = function
     | Arb -> OInt.arbitrary Party.Public
     | Known n -> OInt.make n Party.Public
@@ -112,9 +120,9 @@ module Smart_OArray (OInt : OInt0) = struct
     | Arb -> ()
     | One x -> a.(k) <- x
     | Slice (a', k') -> Array.blit a' k' a k len
-    | Seq (t1, t2) ->
-        fill a k t1;
-        fill a (k + t1.len) t2);
+    | Seq (l, r) ->
+        fill a k l;
+        fill a (k + l.len) r);
     t.v <- Slice (a, k)
 
   let force ({ len; v } as t) =
@@ -141,11 +149,11 @@ module Smart_OArray (OInt : OInt0) = struct
       match v with
       | Arb -> { len = n; v = Arb }
       | Slice (a, k') -> { len = n; v = Slice (a, k + k') }
-      | Seq (t1, _) when k + n <= t1.len -> slice t1 k n
-      | Seq (t1, t2) when t1.len <= k -> slice t2 (k - t1.len) n
-      | Seq (t1, t2) ->
+      | Seq (l, _) when k + n <= l.len -> slice l k n
+      | Seq (l, r) when l.len <= k -> slice r (k - l.len) n
+      | Seq (l, r) ->
           (* This branch should be rarely accessed. *)
-          concat (slice t1 k (t1.len - k)) (slice t2 0 (k + n - t1.len))
+          concat (slice l k (l.len - k)) (slice r 0 (k + n - l.len))
       | One _ -> assert false
 
   let mux_slow s t1 t2 =
@@ -156,9 +164,33 @@ module Smart_OArray (OInt : OInt0) = struct
     { len; v = Slice (a, 0) }
 
   (* Assume [t0] is a singleton, and [t1] and [t2] have the same length. *)
-  let mux t0 t1 t2 =
+  let rec mux t0 ({ v = v1; len } as t1) ({ v = v2; _ } as t2) =
     let s = get t0 in
-    mux_slow s t1 t2
+    match s with
+    | Elem.Arb -> t1
+    | Elem.Known s -> if Bool.of_int s then t1 else t2
+    | _ -> (
+        if Equal.physical v1 v2 then t1
+        else if len = 1 then
+          let m = get t1 in
+          let n = get t2 in
+          let x = Elem.mux s m n in
+          if Elem.cheap_eq x s then t0
+          else if Elem.cheap_eq x m then t1
+          else if Elem.cheap_eq x n then t2
+          else { len; v = One x }
+        else
+          match (v1, v2) with
+          | Arb, _ -> t2
+          | _, Arb -> t1
+          | Seq (l1, r1), Seq (l2, r2) when l1.len = l2.len && r1.len = r2.len
+            ->
+              let l = mux t0 l1 l2 in
+              let r = mux t0 r1 r2 in
+              if Equal.physical l l1 && Equal.physical r r1 then t1
+              else if Equal.physical l l2 && Equal.physical r r2 then t2
+              else { len; v = Seq (l, r) }
+          | _ -> mux_slow s t1 t2)
 end
 
 module Make = Driver.Make (Smart_OArray)
