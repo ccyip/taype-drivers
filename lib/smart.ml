@@ -26,6 +26,7 @@ module Smart_OInt (OInt : OInt0) = struct
     | Obliv _, Known m, Known n when m = n -> Known m
     | Obliv s, Known 1, Known 0 -> Obliv s
     | Obliv s, Known 0, Known 1 -> Obliv (OInt.bnot s)
+    | Obliv _, Obliv m, Obliv n when Equal.physical m n -> Obliv m
     | Obliv s, _, _ -> Obliv (OInt.mux s (force m) (force n))
 
   let binop op obliv_op m n =
