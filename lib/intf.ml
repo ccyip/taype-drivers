@@ -79,7 +79,7 @@ module type S0 = sig
   (** Concatenate two oblivious arrays. *)
 
   val obliv_array_slice : obliv_array -> int -> int -> obliv_array
-  (** [obliv_array_slice a n s] takes [s] elements from offset [n] of oblivious
+  (** [obliv_array_slice a k n] takes [n] elements from offset [k] of oblivious
       array [a]. *)
 
   val obliv_array_mux : obliv_array -> obliv_array -> obliv_array -> obliv_array

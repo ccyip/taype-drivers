@@ -16,8 +16,8 @@ module OArray (OInt : OInt0) = struct
   let slice = Array.sub
 
   let mux a0 a1 a2 =
-    let b = a0.(0) in
-    Array.map2 (Elem.mux b) a1 a2
+    let s = a0.(0) in
+    Array.map2 (Elem.mux s) a1 a2
 
   let to_array a = a
   let of_array a = a
