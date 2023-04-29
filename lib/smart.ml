@@ -1,18 +1,22 @@
 open Intf
 open Containers
 
+type comparison = Eq | Lt | Gt | Unknown
+
 module Smart_OInt (OInt : OInt0) = struct
   type t = Arb | Known of int | Obliv of OInt.t
 
   let obliv x = Obliv x
 
-  (* A sound but incomplete equality check. *)
-  let cheap_eq x y =
+  (* Sound and incomplete comparison. *)
+  let cmp x y =
     match (x, y) with
-    | Arb, Arb -> true
-    | Known m, Known n -> m = n
-    | Obliv m, Obliv n -> Equal.physical m n
-    | _, _ -> false
+    | _, _ when Equal.physical x y -> Eq
+    | Arb, _ -> Gt
+    | _, Arb -> Lt
+    | Known m, Known n when m = n -> Eq
+    | Obliv m, Obliv n when Equal.physical m n -> Eq
+    | _, _ -> Unknown
 
   let force = function
     | Arb -> OInt.arbitrary Party.Public
@@ -163,6 +167,33 @@ module Smart_OArray (OInt : OInt0) = struct
     let a = Array.init len (fun i -> Elem.mux s a1.(k1 + i) a2.(k2 + i)) in
     { len; v = Slice (a, 0) }
 
+  (* Sound and incomplete comparison, in terms of "refinement". [t1] is bigger
+     than [t2], if [t1] has more "arbitrary" than [t2] but they are the same
+     otherwise. Assume [t1] and [t2] have the same length. *)
+  let rec cmp ({ v = v1; len } as t1) ({ v = v2; _ } as t2) =
+    let join c1 c2 =
+      match (c1, c2) with
+      | Eq, c | c, Eq -> c
+      | Lt, Lt -> Lt
+      | Gt, Gt -> Gt
+      | _, _ -> Unknown
+    in
+    match (v1, v2) with
+    | _, _ when Equal.physical v1 v2 -> Eq
+    | Arb, _ -> Gt
+    | _, Arb -> Lt
+    | _, _ when len = 1 -> Elem.cmp (get t1) (get t2)
+    | Slice (a1, k1), Slice (a2, k2) when Equal.physical a1 a2 && k1 = k2 -> Eq
+    | Seq (l, r), Slice (a, k) ->
+        join
+          (cmp l { len = l.len; v = Slice (a, k) })
+          (cmp r { len = r.len; v = Slice (a, k + l.len) })
+    | Slice (a, k), Seq (l, r) ->
+        join
+          (cmp { len = l.len; v = Slice (a, k) } l)
+          (cmp { len = r.len; v = Slice (a, k + l.len) } r)
+    | _, _ -> Unknown
+
   (* Assume [t0] is a singleton, and [t1] and [t2] have the same length. *)
   let rec mux t0 ({ v = v1; len } as t1) ({ v = v2; _ } as t2) =
     let s = get t0 in
@@ -170,27 +201,26 @@ module Smart_OArray (OInt : OInt0) = struct
     | Elem.Arb -> t1
     | Elem.Known s -> if Bool.of_int s then t1 else t2
     | _ -> (
-        if Equal.physical v1 v2 then t1
-        else if len = 1 then
-          let m = get t1 in
-          let n = get t2 in
-          let x = Elem.mux s m n in
-          if Elem.cheap_eq x s then t0
-          else if Elem.cheap_eq x m then t1
-          else if Elem.cheap_eq x n then t2
-          else { len; v = One x }
-        else
-          match (v1, v2) with
-          | Arb, _ -> t2
-          | _, Arb -> t1
-          | Seq (l1, r1), Seq (l2, r2) when l1.len = l2.len && r1.len = r2.len
-            ->
-              let l = mux t0 l1 l2 in
-              let r = mux t0 r1 r2 in
-              if Equal.physical l l1 && Equal.physical r r1 then t1
-              else if Equal.physical l l2 && Equal.physical r r2 then t2
-              else { len; v = Seq (l, r) }
-          | _ -> mux_slow s t1 t2)
+        match cmp t1 t2 with
+        | Lt -> t1
+        | Gt -> t2
+        | Eq -> ( match (v1, v2) with _, Slice _ -> t2 | _, _ -> t1)
+        | Unknown -> (
+            if len = 1 then
+              let m = get t1 in
+              let n = get t2 in
+              let x = Elem.mux s m n in
+              match Elem.cmp x s with Eq -> t0 | _ -> { len; v = One x }
+            else
+              match (v1, v2) with
+              | Seq (l1, r1), Seq (l2, r2)
+                when l1.len = l2.len && r1.len = r2.len ->
+                  let l = mux t0 l1 l2 in
+                  let r = mux t0 r1 r2 in
+                  if Equal.physical l l1 && Equal.physical r r1 then t1
+                  else if Equal.physical l l2 && Equal.physical r r2 then t2
+                  else { len; v = Seq (l, r) }
+              | _ -> mux_slow s t1 t2))
 end
 
 module Make = Driver.Make (Smart_OArray)
