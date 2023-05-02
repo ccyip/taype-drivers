@@ -106,6 +106,17 @@ module type S0 = sig
   module Reveal : sig
     val obliv_int_r : obliv_array -> int
   end
+
+  type memo_t
+  (** Memoization of the oblivious array sizes computed from integer public
+      views. *)
+
+  val make_memo : unit -> memo_t
+  (** Create a new memoization object. *)
+
+  val memo : memo_t -> (int -> int) -> int -> int
+  (** [memo t f x] calculates [f x], possibly retrieving the result from the
+      memoization [t]. *)
 end
 
 module type S = sig

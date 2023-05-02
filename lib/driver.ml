@@ -40,6 +40,18 @@ module Make0 (OArrayF : OArray) (OInt : OInt0) = struct
       assert (OArray.length a = 1);
       Elem.reveal_int (OArray.get a)
   end
+
+  module Hashtbl = Hashtbl.Make' (struct
+    type t = int
+
+    let equal = ( = )
+    let hash i = i
+  end)
+
+  type memo_t = int Hashtbl.t
+
+  let make_memo () = Hashtbl.create 1024
+  let memo tbl f k = Hashtbl.get_or_add tbl ~f ~k
 end
 
 module Make (OArrayF : OArray) (OInt : OInt) = struct
