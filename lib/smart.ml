@@ -95,45 +95,45 @@ module Smart_OArray (OInt : OInt0) = struct
   let single x = { len = 1; v = One x }
 
   (* Assume the length of input is exactly 1. *)
-  let get { v; _ } =
-    match v with
+  let get t =
+    match t.v with
     | Arb -> Elem.Arb
     | One x -> x
     | Slice (a, k) -> a.(k)
     (* A [Seq] has length at least [2]. *)
     | Seq _ -> assert false
 
-  let concat ({ len = len1; v = v1 } as t1) ({ len = len2; v = v2 } as t2) =
-    if len1 = 0 then t2
-    else if len2 = 0 then t1
+  let concat t1 t2 =
+    if t1.len = 0 then t2
+    else if t2.len = 0 then t1
     else
       let v =
-        match (v1, v2) with
+        match (t1.v, t2.v) with
         | Arb, Arb -> Arb
         | Slice (a, k1), Slice (a', k2)
-          when Equal.physical a a' && k2 = k1 + len1 ->
-            v1
+          when Equal.physical a a' && k2 = k1 + t1.len ->
+            t1.v
         | _, _ -> Seq (t1, t2)
       in
-      { len = len1 + len2; v }
+      { len = t1.len + t2.len; v }
 
   (* Invariant: [Array.length a = k + len]. *)
-  let rec fill a k ({ len; v } as t) =
-    (match v with
+  let rec fill a k t =
+    (match t.v with
     (* [a] should be pre-filled by [Elem.Arb]. *)
     | Arb -> ()
     | One x -> a.(k) <- x
-    | Slice (a', k') -> Array.blit a' k' a k len
+    | Slice (a', k') -> Array.blit a' k' a k t.len
     | Seq (l, r) ->
         fill a k l;
         fill a (k + l.len) r);
     t.v <- Slice (a, k)
 
-  let force ({ len; v } as t) =
-    match v with
+  let force t =
+    match t.v with
     | Slice (a, k) -> (a, k)
     | _ ->
-        let a = Array.make len Elem.Arb in
+        let a = Array.make t.len Elem.Arb in
         fill a 0 t;
         (a, 0)
 
@@ -146,11 +146,11 @@ module Smart_OArray (OInt : OInt0) = struct
     Array.init t.len (fun i -> Elem.force a.(k + i))
 
   (* Assume the range is in-bound. *)
-  let rec slice ({ len; v } as t) k n =
+  let rec slice t k n =
     if n = 0 then { len = 0; v = Arb }
-    else if k = 0 && n = len then t
+    else if k = 0 && n = t.len then t
     else
-      match v with
+      match t.v with
       | Arb -> { len = n; v = Arb }
       | Slice (a, k') -> { len = n; v = Slice (a, k + k') }
       | Seq (l, _) when k + n <= l.len -> slice l k n
@@ -170,7 +170,7 @@ module Smart_OArray (OInt : OInt0) = struct
   (* Sound and incomplete comparison, in terms of "refinement". [t1] is bigger
      than [t2], if [t1] has more "arbitrary" than [t2] but they are the same
      otherwise. Assume [t1] and [t2] have the same length. *)
-  let rec cmp ({ v = v1; len } as t1) ({ v = v2; _ } as t2) =
+  let rec cmp t1 t2 =
     let join c1 c2 =
       match (c1, c2) with
       | Eq, c | c, Eq -> c
@@ -178,8 +178,9 @@ module Smart_OArray (OInt : OInt0) = struct
       | Gt, Gt -> Gt
       | _, _ -> Unknown
     in
-    match (v1, v2) with
-    | _, _ when Equal.physical v1 v2 -> Eq
+    let len = t1.len in
+    match (t1.v, t2.v) with
+    | _, _ when Equal.physical t1.v t2.v -> Eq
     | Arb, _ -> Gt
     | _, Arb -> Lt
     | _, _ when len = 1 -> Elem.cmp (get t1) (get t2)
@@ -195,7 +196,7 @@ module Smart_OArray (OInt : OInt0) = struct
     | _, _ -> Unknown
 
   (* Assume [t0] is a singleton, and [t1] and [t2] have the same length. *)
-  let rec mux t0 ({ v = v1; len } as t1) ({ v = v2; _ } as t2) =
+  let rec mux t0 t1 t2 =
     let s = get t0 in
     match s with
     | Elem.Arb -> t1
@@ -204,15 +205,16 @@ module Smart_OArray (OInt : OInt0) = struct
         match cmp t1 t2 with
         | Lt -> t1
         | Gt -> t2
-        | Eq -> ( match (v1, v2) with _, Slice _ -> t2 | _, _ -> t1)
+        | Eq -> ( match (t1.v, t2.v) with _, Slice _ -> t2 | _, _ -> t1)
         | Unknown -> (
+            let len = t1.len in
             if len = 1 then
               let m = get t1 in
               let n = get t2 in
               let x = Elem.mux s m n in
               match Elem.cmp x s with Eq -> t0 | _ -> { len; v = One x }
             else
-              match (v1, v2) with
+              match (t1.v, t2.v) with
               | Seq (l1, r1), Seq (l2, r2)
                 when l1.len = l2.len && r1.len = r2.len ->
                   let l = mux t0 l1 l2 in
