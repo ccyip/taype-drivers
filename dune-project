@@ -24,8 +24,3 @@
  (depends (ctypes (>= 0.20)))
  (synopsis "Emp-toolkit driver for the Taype language")
 )
-
-(package
- (name taype-driver-coil)
- (synopsis "COIL driver for the Taype language")
-)

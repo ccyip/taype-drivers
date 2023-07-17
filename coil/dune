@@ -1,4 +1,0 @@
-(library
- (name taype_driver_coil)
- (public_name taype-driver-coil)
- (libraries taype_driver containers))
