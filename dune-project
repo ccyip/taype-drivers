@@ -3,7 +3,7 @@
 
 (generate_opam_files true)
 
-(name taype-drives)
+(name taype-drivers)
 (license "MIT")
 (maintainers "Qianchuan Ye <yeqianchuan@gmail.com>")
 (authors "Qianchuan Ye")
