@@ -68,12 +68,14 @@ module Make (OArrayF : OArray) (OInt : OInt) = struct
   include Make0 (OArrayF) (OInt)
   module Plaintext = Make0 (OArrayF) (Plaintext_OInt0)
 
+  let plaintext_array_to_array = Plaintext.OArray.to_array
+  let plaintext_array_of_array = Plaintext.OArray.of_array
   let obliv_array_to_array = OArray.to_array
 
   module Conceal = struct
     let obliv_array_conceal a =
       let f x = OInt.make x !this_party in
-      Array.map f (Plaintext.OArray.to_array a) |> OArray.of_array
+      Array.map f (plaintext_array_to_array a) |> OArray.of_array
 
     let obliv_array_conceal_with s x = obliv_array_conceal (s x)
 
@@ -84,15 +86,25 @@ module Make (OArrayF : OArray) (OInt : OInt) = struct
     let obliv_bool_s b = obliv_int_s (Bool.to_int b)
     let obliv_int_s_for party = obliv_array_new_for 1 party
     let obliv_bool_s_for party = obliv_array_new_for 1 party
+
+    module Plaintext = struct
+      let obliv_int_s = Plaintext.obliv_int_s
+      let obliv_bool_s b = obliv_int_s (Bool.to_int b)
+    end
   end
 
   module Reveal = struct
     let obliv_array_reveal a =
       let f x = OInt.reveal_int x in
-      Array.map f (OArray.to_array a) |> Plaintext.OArray.of_array
+      Array.map f (OArray.to_array a) |> plaintext_array_of_array
 
     let obliv_array_reveal_with r a = r (obliv_array_reveal a)
     let obliv_int_r = Reveal.obliv_int_r
     let obliv_bool_r a = Bool.of_int (obliv_int_r a)
+
+    module Plaintext = struct
+      let obliv_int_r = Plaintext.Reveal.obliv_int_r
+      let obliv_bool_r a = Bool.of_int (obliv_int_r a)
+    end
   end
 end

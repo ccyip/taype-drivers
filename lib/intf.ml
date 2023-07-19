@@ -139,6 +139,9 @@ module type S = sig
   (** This is a module providing the plaintext cryptographic primitives, which
       are used in the conceal and reveal phases to generate plaintext arrays. *)
 
+  val plaintext_array_to_array : Plaintext.obliv_array -> int array
+  val plaintext_array_of_array : int array -> Plaintext.obliv_array
+
   module Conceal : sig
     (** This module includes functions that are used in the conceal phase. *)
 
@@ -166,6 +169,14 @@ module type S = sig
 
     val obliv_bool_s_for : party -> obliv_array
     (** Help the private data-owner [party] do the boolean section. *)
+
+    module Plaintext : sig
+      val obliv_int_s : int -> Plaintext.obliv_array
+      (** Plaintext integer section *)
+
+      val obliv_bool_s : bool -> Plaintext.obliv_array
+      (** Plaintext boolean section *)
+    end
   end
 
   module Reveal : sig
@@ -186,6 +197,14 @@ module type S = sig
 
     val obliv_bool_r : obliv_array -> bool
     (** Oblivious boolean retraction *)
+
+    module Plaintext : sig
+      val obliv_int_r : Plaintext.obliv_array -> int
+      (** Plaintext integer retraction *)
+
+      val obliv_bool_r : Plaintext.obliv_array -> bool
+      (** Plaintext boolean retraction *)
+    end
   end
 end
 
