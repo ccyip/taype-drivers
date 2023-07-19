@@ -103,10 +103,6 @@ module type S0 = sig
   val obliv_bool_and : obliv_array -> obliv_array -> obliv_array
   val obliv_bool_or : obliv_array -> obliv_array -> obliv_array
 
-  module Reveal : sig
-    val obliv_int_r : obliv_array -> int
-  end
-
   type memo_t
   (** Memoization of the oblivious array sizes computed from integer public
       views. *)
@@ -135,12 +131,18 @@ module type S = sig
 
   include S0
 
-  module Plaintext : S0
-  (** This is a module providing the plaintext cryptographic primitives, which
-      are used in the conceal and reveal phases to generate plaintext arrays. *)
+  module Plaintext : sig
+    (** This is a module providing the plaintext cryptographic primitives, which
+        are used in the conceal and reveal phases to generate plaintext arrays. *)
 
-  val plaintext_array_to_array : Plaintext.obliv_array -> int array
-  val plaintext_array_of_array : int array -> Plaintext.obliv_array
+    include S0
+
+    val to_array : obliv_array -> int array
+    val of_array : int array -> obliv_array
+    val obliv_bool_s : bool -> obliv_array
+    val obliv_int_r : obliv_array -> int
+    val obliv_bool_r : obliv_array -> bool
+  end
 
   module Conceal : sig
     (** This module includes functions that are used in the conceal phase. *)
@@ -169,14 +171,6 @@ module type S = sig
 
     val obliv_bool_s_for : party -> obliv_array
     (** Help the private data-owner [party] do the boolean section. *)
-
-    module Plaintext : sig
-      val obliv_int_s : int -> Plaintext.obliv_array
-      (** Plaintext integer section *)
-
-      val obliv_bool_s : bool -> Plaintext.obliv_array
-      (** Plaintext boolean section *)
-    end
   end
 
   module Reveal : sig
@@ -197,14 +191,6 @@ module type S = sig
 
     val obliv_bool_r : obliv_array -> bool
     (** Oblivious boolean retraction *)
-
-    module Plaintext : sig
-      val obliv_int_r : Plaintext.obliv_array -> int
-      (** Plaintext integer retraction *)
-
-      val obliv_bool_r : Plaintext.obliv_array -> bool
-      (** Plaintext boolean retraction *)
-    end
   end
 end
 
