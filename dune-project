@@ -11,16 +11,18 @@
 
 (package
  (name taype-driver-lib)
+ (depends containers)
  (synopsis "Common types and routines for writing drivers for the Taype language")
 )
 
 (package
  (name taype-driver-plaintext)
+ (depends taype-driver-lib)
  (synopsis "Plaintext driver for the Taype language")
 )
 
 (package
  (name taype-driver-emp)
- (depends (ctypes (>= 0.20)))
+ (depends (ctypes (>= 0.20)) taype-driver-lib)
  (synopsis "Emp-toolkit driver for the Taype language")
 )
