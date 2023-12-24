@@ -19,3 +19,4 @@ module OInt = struct
 end
 
 module Driver = Make (OInt)
+module Driver_naive = Make_naive (OInt)
